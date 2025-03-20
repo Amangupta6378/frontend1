@@ -37,6 +37,15 @@ const Sidebarr = () => {
                         <span className="material-icons mr-2">event_repeat</span>
                         Flex
                     </NavLink>
+                    <NavLink 
+                        to="/bulkAction"
+                        className={({ isActive }) => 
+                            `flex items-center p-3 mb-2 rounded ${isActive ? 'bg-gray-700' : 'hover:bg-gray-600'}`
+                        }
+                    >
+                        <span className="material-icons mr-2">event_repeat</span>
+                        Bulk Action
+                    </NavLink>
                 </div>
 
                 <h3 className="text-sm font-semibold mb-2">Pay Methods</h3>

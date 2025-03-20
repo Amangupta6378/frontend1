@@ -11,6 +11,7 @@ import DetailedFeeComponent from './Studenttt/DetailedFeeComponent';
 import StudentView from './Studenttt/StudentView';
 import Flex from './Studenttt/Flex';
 import InstituteSidebar from './insttituefolder/InstituteSidebar';
+import BulkAaction from './BulkAction/BulkAction';
 
 const SidebarRoute = () => {
     const location = useLocation();
@@ -35,6 +36,7 @@ const SidebarRoute = () => {
                     <Route path="/detailed-fee/:studentId" element={<DetailedFeeComponent />} />
                     <Route path="/feecomponent/:studentId" element={<FeeComponent />} />
                     <Route path="/fee-structure/:studentId" element={<FeeStructure />} />
+                    <Route path="/bulkAction" element={<BulkAaction/>} />
                     <Route path="*" element={<Navigate to="/students" />} />
                 </Routes>
             </div>

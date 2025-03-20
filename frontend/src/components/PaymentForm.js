@@ -1,54 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
-import { FaSearch, FaEnvelope, FaWhatsapp, FaRupeeSign, FaSpinner, FaCalendar } from "react-icons/fa";
+import { FaEnvelope, FaWhatsapp, FaRupeeSign, FaSpinner } from "react-icons/fa";
 
 const PaymentForm = () => {
-  const [studentIdInput, setStudentIdInput] = useState("");
-  const [selectedStudent, setSelectedStudent] = useState(null);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState("");
-  const [installmentDate, setInstallmentDate] = useState("");
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleFindStudent = async () => {
-    setMessage("Searching...");
-    setIsLoading(true);
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/api/students/${studentIdInput.trim()}`
-      );
-      const student = response.data;
-      console.log("Student Data:", student); // Debugging log
-      console.log("Fee Structure:", student.feeStructure); // Debugging log
-      console.log("Installments:", student.feeStructure?.installments); // Debugging log
-
-      setSelectedStudent(student);
-      setEmail(student.contactEmail);
-      setPhone(student.contactPhone);
-
-      // Get the first installment
-      const firstInstallment = student.feeStructure?.installments?.[0];
-      if (firstInstallment) {
-        setAmount(firstInstallment.amount); // Set the amount
-        // Format the date to YYYY-MM-DD
-        const formattedDate = new Date(firstInstallment.dueDate).toISOString().split("T")[0];
-        setInstallmentDate(formattedDate); // Set the formatted installment date
-      } else {
-        setAmount(""); // If no installments are available, set amount to empty
-        setInstallmentDate(""); // Set installment date to empty
-      }
-
-      setMessage("✅ Student Found");
-    } catch (error) {
-      console.error("Error fetching student:", error);
-      setSelectedStudent(null);
-      setMessage("❌ Student not found!");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,7 +17,7 @@ const PaymentForm = () => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/students/create-payment-link",
-        { email, phone, amount, installmentDate }
+        { email, phone, amount }
       );
 
       if (response.data.success) {
@@ -80,37 +39,7 @@ const PaymentForm = () => {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Student ID */}
-        <div>
-          <label className="block mb-2 font-medium text-gray-700">
-            Enter Student ID:
-          </label>
-          <div className="flex items-center">
-            <input
-              type="text"
-              className="flex-1 border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-              placeholder="Enter student ID"
-              value={studentIdInput}
-              onChange={(e) => setStudentIdInput(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={handleFindStudent}
-              disabled={isLoading}
-              className="ml-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <FaSpinner className="animate-spin mr-2" />
-              ) : (
-                <FaSearch className="mr-2" />
-              )}
-              Find Student
-            </button>
-          </div>
-        </div>
-
-        {/* Auto-filled fields */}
+        {/* Email */}
         <div>
           <label className="flex items-center mb-2 font-medium text-gray-700">
             <FaEnvelope className="mr-2 text-blue-500" /> Email:
@@ -118,11 +47,14 @@ const PaymentForm = () => {
           <input
             type="email"
             value={email}
-            readOnly
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            placeholder="Enter email"
+            required
           />
         </div>
 
+        {/* WhatsApp Number */}
         <div>
           <label className="flex items-center mb-2 font-medium text-gray-700">
             <FaWhatsapp className="mr-2 text-green-500" /> WhatsApp Number:
@@ -130,11 +62,14 @@ const PaymentForm = () => {
           <input
             type="tel"
             value={phone}
-            readOnly
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            onChange={(e) => setPhone(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            placeholder="Enter WhatsApp number"
+            required
           />
         </div>
 
+        {/* Amount */}
         <div>
           <label className="flex items-center mb-2 font-medium text-gray-700">
             <FaRupeeSign className="mr-2 text-yellow-500" /> Amount (INR):
@@ -142,28 +77,19 @@ const PaymentForm = () => {
           <input
             type="number"
             value={amount}
-            readOnly // Make the amount field read-only
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            placeholder="Enter amount"
+            required
           />
         </div>
 
-        <div>
-          <label className="flex items-center mb-2 font-medium text-gray-700">
-            <FaCalendar className="mr-2 text-purple-500" /> Installment Date:
-          </label>
-          <input
-            type="text"
-            value={installmentDate}
-            readOnly // Make the date field read-only
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
-          />
-        </div>
-
+        {/* Submit Button */}
         <button
           type="submit"
-          disabled={!amount || isLoading}
+          disabled={!email || !phone || !amount || isLoading}
           className={`w-full py-3 text-white font-semibold rounded-lg flex items-center justify-center transition-all duration-300 ${
-            amount
+            email && phone && amount
               ? "bg-green-600 hover:bg-green-700"
               : "bg-gray-400 cursor-not-allowed"
           }`}
@@ -176,6 +102,7 @@ const PaymentForm = () => {
         </button>
       </form>
 
+      {/* Message Display */}
       {message && (
         <p
           className={`mt-6 text-center font-semibold ${
